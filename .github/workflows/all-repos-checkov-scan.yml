@@ -6,6 +6,7 @@ on:
 jobs:
   get-org-repos:
     runs-on: ubuntu-latest
+    environment: PrismaCloudEnv
     steps:
       - uses: austenstone/get-org-repos@main
         with:
