@@ -60,4 +60,3 @@ jobs:
               --ref=${{steps.checkout.outputs.ref}} \
               --commit=${{steps.checkout.outputs.commit}} \
               --sarif=results.sarif \
-              --github-auth-stdin 
