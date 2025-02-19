@@ -52,13 +52,13 @@ jobs:
           wget https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
           tar -xvzf codeql-bundle-linux64.tar.gz
           ls -ltr ${{ github.workspace }}/codeql
-          echo "${{ github.workspace }}/codeql" >> $GITHUB_PATH
-          echo $GITHUB_PATH
-          codeql version
+          echo "${{ github.workspace }}/codeql" >> $GITHUB_PATH          
       - name: Upload SARIF file
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          echo $GITHUB_PATH
+          codeql version
           codeql github upload-results \
               --repository=${{ github.repository_owner }}/${{ matrix.repo }} \
               --ref=${{steps.checkout.outputs.ref}} \
