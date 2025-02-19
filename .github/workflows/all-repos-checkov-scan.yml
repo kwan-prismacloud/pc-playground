@@ -1,0 +1,52 @@
+name: Manual workflow to use checkov to scan all repos in the org
+
+on:
+  workflow_dispatch:
+
+jobs:
+  get-org-repos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: austenstone/get-org-repos@main
+        with:
+          github-token: ${{ secrets.TOKEN }}
+        id: get-org-repos
+    outputs:
+      repos: ${{ steps.get-org-repos.outputs.repos }}
+
+  checkov_scan:
+    permissions:
+      contents: read 
+      security-events: write 
+      actions: read 
+    needs:
+      - get-org-repos
+    runs-on: ubuntu-latest
+    name: Run Checkov Code Scan
+    environment: PrismaCloudEnv
+    strategy:
+      matrix:
+        repo: ${{ fromJson(needs.get-org-repos.outputs.repos) }}
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          repository: ${{ github.event.organization.login }}/${{ matrix.repo }}
+          token: ${{ secrets.GH_TOKEN }}
+      - id: code-scan
+        name: Checkov GitHub Action
+        uses:  bridgecrewio/checkov-action@master
+        with:
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+          api-key: ${{ secrets.BC_API_KEY }}
+          prisma-api-url: ${{ secrets.PRISMA_CLOUD_API_URL }}
+          directory: '.'
+          soft_fail: true
+          use_enforcement_rules: false
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
