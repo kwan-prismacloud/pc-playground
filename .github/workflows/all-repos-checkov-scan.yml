@@ -32,7 +32,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
         with:
-          repository: ${{ github.event.organization.login }}/${{ matrix.repo }}
+          repository: ${{ github.repository_owner }}/${{ matrix.repo }}
           token: ${{ secrets.GH_TOKEN }}
       - id: code-scan
         name: Checkov GitHub Action
