@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: austenstone/get-org-repos@main
         with:
-          github-token: ${{ secrets.TOKEN }}
+          github-token: ${{ secrets.GH_TOKEN }}
         id: get-org-repos
     outputs:
       repos: ${{ steps.get-org-repos.outputs.repos }}
