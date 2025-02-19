@@ -48,8 +48,16 @@ jobs:
           soft_fail: true
           use_enforcement_rules: false
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
-        if: success() || failure()
-        with:
-          sarif_file: results.sarif
-          token: ${{ secrets.GH_TOKEN }}
+        # uses: github/codeql-action/upload-sarif@v3
+        # if: success() || failure()
+        # with:
+        #   sarif_file: results.sarif
+        #   token: ${{ secrets.GH_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: codeql github upload-results \
+              --repository=${{ github.repository_owner }}/${{ matrix.repo }} \
+              --ref=${{steps.checkout.outputs.ref}} \
+              --commit=${{steps.checkout.outputs.commit}} \
+              --sarif=results.sarif \
+              --github-auth-stdin 
