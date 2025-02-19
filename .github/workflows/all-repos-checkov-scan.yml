@@ -30,7 +30,8 @@ jobs:
         repo: ${{ fromJson(needs.get-org-repos.outputs.repos) }}
       fail-fast: false
     steps:
-      - name: Checkout
+      - id: checkout
+        name: Checkout
         uses: actions/checkout@master
         with:
           repository: ${{ github.repository_owner }}/${{ matrix.repo }}
@@ -51,3 +52,5 @@ jobs:
         if: success() || failure()
         with:
           sarif_file: results.sarif
+          ref: ${{steps.checkout.outputs.ref}}
+          sha: ${{steps.checkout.outputs.commit}}
