@@ -15,7 +15,7 @@ jobs:
       - name: Marshall Repos output
         id: repos-output
         run: |
-          echo "reposBatch=$(jq -nc ${{steps.get-org-repos.outputs.repos}} | '[_nwise(200)]')" >> "$GITHUB_OUTPUT"
+          echo "reposBatch=$(jq -nc '${{steps.get-org-repos.outputs.repos}} | _nwise(5)')" >> "$GITHUB_OUTPUT"
     outputs:
       repos: ${{ steps.repos-output.outputs.reposBatch }}
 
