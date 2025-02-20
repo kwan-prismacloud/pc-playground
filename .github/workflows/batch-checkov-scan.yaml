@@ -1,0 +1,56 @@
+name: Manual workflow to use checkov to scan all repos in the org
+
+on:
+  workflow_call:
+    inputs:
+        repos:
+        required: true
+        type: string
+
+jobs:
+  checkov_scan:
+    permissions:
+      contents: read 
+      security-events: write 
+      actions: read 
+    runs-on: ubuntu-latest
+    name: Run Checkov Code Scan
+    strategy:
+      matrix:
+        repos: ${{ inputs.repos | split(',') }} 
+      fail-fast: false
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@master
+        with:
+          repository: ${{ github.repository_owner }}/${{ matrix.repos }}
+          token: ${{ secrets.GH_TOKEN }}
+      - id: code-scan
+        name: Checkov GitHub Action
+        uses:  bridgecrewio/checkov-action@master
+        with:
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+          api-key: ${{ secrets.BC_API_KEY }}
+          prisma-api-url: ${{ secrets.PRISMA_CLOUD_API_URL }}
+          directory: '.'
+          soft_fail: true
+          use_enforcement_rules: false
+      - name: Install CodeQL CLI
+        run: |
+          wget https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
+          tar -xvzf codeql-bundle-linux64.tar.gz
+          ls -ltr ${{ github.workspace }}/codeql
+          echo "${{ github.workspace }}/codeql" >> $GITHUB_PATH          
+      - name: Upload SARIF file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          echo $GITHUB_PATH
+          codeql version
+          codeql github upload-results \
+              --repository=${{ github.repository_owner }}/${{ matrix.repo }} \
+              --ref=${{steps.checkout.outputs.ref}} \
+              --commit=${{steps.checkout.outputs.commit}} \
+              --sarif=results.sarif
