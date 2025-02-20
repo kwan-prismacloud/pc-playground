@@ -12,11 +12,12 @@ jobs:
         with:
           github-token: ${{ secrets.GH_TOKEN }}
         id: get-org-repos
-      - name: Create Repos Input
+      - name: Marshall Repos output
+        id: repos-output
         run: |
           echo "reposBatch=$(jq -nc ${{steps.get-org-repos.outputs.repos}} | '[_nwise(200)]')" >> "$GITHUB_OUTPUT"
     outputs:
-      repos: ${{ reposBatch }}
+      repos: ${{ steps.repos-output.outputs.reposBatch }}
 
   call-workflow-batch-checkov-scan:
     needs:
