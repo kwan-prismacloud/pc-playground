@@ -12,21 +12,21 @@ jobs:
         with:
           github-token: ${{ secrets.GH_TOKEN }}
         id: get-org-repos
+      # - name: Create Repos Input
+      #   run: |
+      #     reposString=$(echo ${{ matrix.repos }} | jq -r '.')
     outputs:
-      repos: ${{ steps.get-org-repos.outputs.repos }}
+      # repos: ${{ steps.get-org-repos.outputs.repos }}
+      repos: ${{ fromJson(steps.get-org-repos.outputs.repos)  | jq -cM '[_nwise(100)]' }}
 
   call-workflow-batch-checkov-scan:
     needs:
       - get-org-repos
     strategy:
       matrix:
-        repos: ${{ fromJson(needs.get-org-repos.outputs.repos) | jq -cM '[_nwise(100)]' }}
+        repos: ${{ join(needs.get-org-repos.outputs.repos, ', ') }}
       fail-fast: false
-    steps:
-      - name: Create Repos Input
-        run: |
-          reposString=$(echo ${{ matrix.repos }} | jq -r '.')
-      - uses: ${{ github.repository_owner }}/${{github.repository}}/.github/workflows/batch-checkov-scan.yml@main
-        with:
-          repos: ${{ reposString }}
-        secrets: inherit          
+    uses: ${{ github.repository_owner }}/${{github.repository}}/.github/workflows/batch-checkov-scan.yml@main
+    with:
+      repos: ${{ matrix.repos }}
+    secrets: inherit          

@@ -3,7 +3,7 @@ name: Manual workflow to use checkov to scan all repos in the org
 on:
   workflow_call:
     inputs:
-        repos:
+        repos: # "['repo1','repo2']"
         required: true
         type: string
 
@@ -17,14 +17,14 @@ jobs:
     name: Run Checkov Code Scan
     strategy:
       matrix:
-        repos: ${{ inputs.repos | split(',') }} 
+        repo: ${{ fromJson(inputs.repos) }} 
       fail-fast: false
     steps:
       - id: checkout
         name: Checkout
         uses: actions/checkout@master
         with:
-          repository: ${{ github.repository_owner }}/${{ matrix.repos }}
+          repository: ${{ github.repository_owner }}/${{ matrix.repo }}
           token: ${{ secrets.GH_TOKEN }}
       - id: code-scan
         name: Checkov GitHub Action
