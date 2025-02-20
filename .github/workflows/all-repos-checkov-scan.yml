@@ -26,7 +26,7 @@ jobs:
       matrix:
         repos: ${{ join(needs.get-org-repos.outputs.repos, ', ') }}
       fail-fast: false
-    uses: ${{ github.repository_owner }}/${{github.repository}}/.github/workflows/batch-checkov-scan.yml@main
+    uses: ${{ github.repository }}/.github/workflows/batch-checkov-scan.yml@main
     with:
       repos: ${{ matrix.repos }}
     secrets: inherit          
