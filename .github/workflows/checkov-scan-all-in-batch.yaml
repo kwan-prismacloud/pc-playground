@@ -22,6 +22,10 @@ jobs:
   call-workflow-batch-checkov-scan:
     needs:
       - get-org-repos
+    permissions:
+      contents: read 
+      security-events: write 
+      actions: read 
     strategy:
       matrix:
         repos: ${{ needs.get-org-repos.outputs.repos }}
