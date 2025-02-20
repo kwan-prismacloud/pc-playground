@@ -14,7 +14,7 @@ jobs:
         id: get-org-repos
       - name: Create Repos Input
         run: |
-          reposBatch=$(jq -nc ${{steps.get-org-repos.outputs.repos}} | '[_nwise(200)]')
+          echo "reposBatch=$(jq -nc ${{steps.get-org-repos.outputs.repos}} | '[_nwise(200)]')" >> "$GITHUB_OUTPUT"
     outputs:
       repos: ${{ reposBatch }}
 
