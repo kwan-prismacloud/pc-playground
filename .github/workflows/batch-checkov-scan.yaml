@@ -3,7 +3,7 @@ name: Manual workflow to use checkov to scan all repos in the org
 on:
   workflow_call:
     inputs:
-        repos: # "['repo1','repo2']"
+      repos:
         required: true
         type: string
 
