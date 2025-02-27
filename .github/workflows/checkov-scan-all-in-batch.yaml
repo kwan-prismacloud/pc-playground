@@ -15,9 +15,9 @@ jobs:
       - name: Marshall Repos output
         id: repos-output
         run: |
-          echo "reposBatch=$(jq -nc '${{steps.get-org-repos.outputs.repos}} | _nwise(5)' | jq '. | tostring' | jq -s | jq '. | tostring')" >> "$GITHUB_OUTPUT"
-    # outputs:
-    #   repos: ${{ steps.repos-output.outputs.reposBatch }}
+          echo "reposBatch=$(jq -nc '${{steps.get-org-repos.outputs.repos}} | _nwise(200)' | jq -s | jq '. | tostring)" >> "$GITHUB_OUTPUT"
+    outputs:
+      repos: ${{ steps.repos-output.outputs.reposBatch }}
 
   call-workflow-batch-checkov-scan:
     needs:
@@ -28,7 +28,7 @@ jobs:
       actions: read 
     strategy:
       matrix:
-        repos: ['[backend-app,front-end,log4shell-vulnerable-app,badCode,supplygoat]', '[ai-goat,terraform-kwan-modules,prisma-cloud-app-sec-workshop]']
+        repos: ${{ fromJson(needs.get-org-repos.outputs.repos) }}
       fail-fast: false
     uses: ./.github/workflows/batch-checkov-scan.yaml
     with:
