@@ -3,7 +3,7 @@ terraform {
 
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "~> 5.0"
     }
     random = {
@@ -30,6 +30,10 @@ module "vpc" {
 
   enable_nat_gateway = true
 
+  tags = {
+    yor_name  = "vpc"
+    yor_trace = "03d687eb-029a-4453-af5c-77361e026527"
+  }
 }
 
 module "ec2_instances" {
@@ -45,13 +49,20 @@ module "ec2_instances" {
   subnet_id              = module.vpc.public_subnets[0]
 
   associate_public_ip_address = true
-  
+
+  tags = {
+    yor_name  = "ec2_instances"
+    yor_trace = "4756b24e-060e-476b-be77-7f968a162b37"
+  }
 }
 
 module "website_s3_bucket" {
   source        = "github.com/kwan-prismacloud/terraform-kwan-modules//aws-s3-static-website-bucket"
   bucket_prefix = var.static_website_s3_bucket_prefix
-  tags          = var.static_website_s3_bucket_tags
+  tags = merge(var.static_website_s3_bucket_tags, {
+    yor_name  = "website_s3_bucket"
+    yor_trace = "9b9b4c0f-573a-480b-a07e-686bd2ec600f"
+  })
 }
 
 module "example" {
